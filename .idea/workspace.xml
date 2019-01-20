@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="db0372e5-c6d5-4f54-888e-5e689f78c1ae" name="Default Changelist" comment="" />
+    <list default="true" id="db0372e5-c6d5-4f54-888e-5e689f78c1ae" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AdaBoost/.ipynb_checkpoints/AdaBoost-myself-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/AdaBoost/.ipynb_checkpoints/AdaBoost-myself-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AdaBoost/AdaBoost-myself.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/AdaBoost/AdaBoost-myself.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AdaBoost/adaboost-myself.py" beforeDir="false" afterPath="$PROJECT_DIR$/AdaBoost/adaboost-myself.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,31 +21,32 @@
     <session id="-1201091305">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.1" value="1" />
-          <entry key="project.open.time.4" value="2" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.open.time.4" value="3" />
+          <entry key="project.opened" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="16" />
+          <entry key="py" value="17" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="16" />
+          <entry key="Python" value="17" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="adaboost" value="41" />
-          <entry key="py" value="2734" />
+          <entry key="adaboost-myself" value="35" />
+          <entry key="py" value="6830" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="2775" />
+          <entry key="Python" value="6906" />
         </counts>
       </usages-collector>
     </session>
@@ -53,10 +59,27 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AdaBoost/adaboost-myself.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="44" column="113" selection-start-line="44" selection-start-column="113" selection-end-line="44" selection-end-column="113" />
+            <state relative-caret-position="526">
+              <caret line="179" column="56" selection-start-line="179" selection-start-column="56" selection-end-line="179" selection-end-column="56" />
               <folding>
-                <element signature="e#80#542#0" />
+                <element signature="e#71#1899#0" />
+                <element signature="e#2071#2550#0" />
+                <element signature="e#5162#5288#0" />
+                <marker date="1547966092305" expanded="true" signature="3095:4240" ph="..." />
+                <marker date="1547966092305" expanded="true" signature="4289:4682" ph="..." />
+                <marker date="1547966092305" expanded="true" signature="4714:5867" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/AdaBoost/adaboost.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-328">
+              <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
+              <folding>
+                <element signature="e#4320#4362#0" />
               </folding>
             </state>
           </provider>
@@ -90,10 +113,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2266" />
-    <option name="y" value="65" />
+    <option name="x" value="1789" />
+    <option name="y" value="79" />
     <option name="width" value="1936" />
-    <option name="height" value="1047" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -269,7 +292,7 @@
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15991472" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16151386" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" weight="0.32995737" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -289,7 +312,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" weight="0.3464819" />
-      <window_info anchor="right" x="0" y="0" width="434" height="856" id="Documentation" order="4" side_tool="true" weight="0.21002132" />
+      <window_info anchor="right" x="0" y="0" width="434" height="856" id="Documentation" order="4" side_tool="true" visible="true" weight="0.21002132" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
   </component>
@@ -298,22 +321,6 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/AdaBoost/adaboost-myself.py</url>
-          <line>48</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/AdaBoost/adaboost-myself.py</url>
-          <line>71</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://C:/Program Files (x86)/Python/Python37/Lib/warnings.py">
@@ -348,10 +355,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="85" selection-start-line="85" selection-end-line="85" selection-end-column="23" />
-          <folding>
-            <marker date="1547718280696" expanded="true" signature="322:1422" ph="..." />
-            <marker date="1547718280696" expanded="true" signature="1447:5490" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -378,22 +381,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AdaBoost/adaboost.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="823">
-          <caret line="99" column="34" selection-start-line="99" selection-start-column="34" selection-end-line="99" selection-end-column="34" />
+        <state relative-caret-position="-328">
+          <caret line="52" column="42" selection-start-line="52" selection-start-column="42" selection-end-line="52" selection-end-column="42" />
           <folding>
-            <element signature="e#87#106#0" expanded="true" />
-            <element signature="e#128#149#0" />
-            <element signature="e#4976#5438#0" />
+            <element signature="e#4320#4362#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AdaBoost/adaboost-myself.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="44" column="113" selection-start-line="44" selection-start-column="113" selection-end-line="44" selection-end-column="113" />
+        <state relative-caret-position="526">
+          <caret line="179" column="56" selection-start-line="179" selection-start-column="56" selection-end-line="179" selection-end-column="56" />
           <folding>
-            <element signature="e#80#542#0" />
+            <element signature="e#71#1899#0" />
+            <element signature="e#2071#2550#0" />
+            <element signature="e#5162#5288#0" />
+            <marker date="1547966092305" expanded="true" signature="3095:4240" ph="..." />
+            <marker date="1547966092305" expanded="true" signature="4289:4682" ph="..." />
+            <marker date="1547966092305" expanded="true" signature="4714:5867" ph="..." />
           </folding>
         </state>
       </provider>

@@ -1,160 +1,164 @@
 import numpy as np
 
 
-def stump_classify(testset, dim, thresh_val, inequal):
+def stump_train(trainset, D, is_print=False):
     '''
-    单层决策树分类函数
-    :param testset : [np.array(m,n)] 训练集
-    :param dim : [int] 特征的索引号
-    :param thresh_val : [float] 阈值
-    :param inequal : [str] 假设
-    :return : [np.array(m,1)] 分类结果
-    '''
-    m = testset.shape[0]
-    predict_class = np.ones((m,1))
-    if inequal == 'lt':  # 假设：大于阈值为正样本
-        predict_class[testset[:,dim] <= thresh_val] = -1.0
-    else:  # 假设：大于阈值为负样本
-        predict_class[testset[:,dim] > thresh_val] = -1.0
-    return predict_class
-
-
-def build_stump(trainset, D, is_print=False):
-    '''
-    建立最佳单层决策树
-    :param trainset : [np.array(m,n+1)]训练集
-    :param D : [np.array(m,1)]样本权重矩阵
-    :param is_print : [boolean]是否打印每次迭代结果
-    :return : [dict]best_stump 最佳单层决策树, [float]min_error 最小分类器错误率, [np.array(m,1)]分类器的分类结果
+    单层决策树的训练过程
+    :param trainset: [np.array(m,n+1)] 训练集
+    :param D: [np.array(m,1)] 样本权重向量
+    :param is_print: [boolean] 是否输出中间过程
+    :return: [dict] best_stump 最佳单层决策树, 字段有{dim:特征索引号; thresh_val:阈值; inequal:假设;}
+             [float] min_error 最佳单层决策树的训练错误率
     '''
     m, n = trainset.shape
-    n = n - 1  # 因为trainset包含了标签
-    labels = trainset[:, -1].reshape((m, 1))  # 标签向量
-    assert (D.shape == (m, 1))
-    min_error = float('inf')  # 最小错误率，并初始化为正无穷
-    step_num = 10  # 步长,即分支数
+    n = n-1
+    labels = trainset[:,-1].reshape((m,1))  # 真实标签
+    step_num = 10  # 步长, 即待选阈值的个数
+    assert(D.shape == (m,1))
+
     best_stump = {}  # 最佳单层决策树
-    best_predict = np.zeros((m,1))  # 最佳单层决策树对训练集产生的分类结果
+    min_error = float('inf')  # 最佳单层决策树的错误率（也是最小的错误率）,初始化为正无穷
+    best_predicts = None  # 最佳单层决策树的分类结果
     for i in range(n):  # 遍历每个特征
-        feature_min = trainset[:, i].min()  # 训练集中第 i 个特征的最小值
-        feature_max = trainset[:, i].max()  # 训练集中第 i 个特征的最大值
-        step_size = (feature_max - feature_min) / float(step_num)
-        for j in range(-1, step_num + 1):
-            thresh_val = feature_min + step_size * j  # 阈值
-            for inequal in ['lt', 'gt']:  # 遍历不等号，lt 是 less than，gt 是 great than
-                predict_labels = stump_classify(trainset, i, thresh_val, inequal)  # 单层决策树分类函数，与下面5行代码等价。函数定义在下面.
-                error_array = np.ones(labels.shape)
-                error_array[predict_labels == labels] = 0
-                # weight_error = float(np.dot(D.T, error_array) / m)  # 加上样本权重后的错误率
-                weight_error = np.dot(D.T, error_array)  # 加上样本权重后的错误率
-                if is_print:
-                    print('split: 第 {} 个特征, 阈值 {}, 假设 {}, 加权错误率 {}'.format(i, thresh_val, inequal, weight_error))
+        feature_min = trainset[:,i].min()  # 第 i 个特征的最小值
+        feature_max = trainset[:,i].max()  # 第 i 个特征的最大值
+        step_size = (feature_max - feature_min) / float(step_num)  # 步距
+        for j in range(-1, step_num+1):  # 遍历每个阈值
+            thresh_val = feature_min + j * step_size  # 当前选择的阈值
+            for inequal in ['lt', 'gt']:  # 遍历两种假设
+                # 1. 预测分类结果
+                cur_predicts = stump_classify(trainset, i, thresh_val, inequal)  # 构建单层决策树并预测分类结果
+
+                # 2. 计算当前分类器的加权错误率
+                error_array = np.ones(cur_predicts.shape)  # 错误向量, 分类错误的样本的标记为1
+                error_array[cur_predicts == labels] = 0  # 分类正确的样本的标记置零
+                # 因为 D 就是一个概率分布,所有不需要再除以 m
+                weight_error = float(np.dot(D.T, error_array))  # 加权错误率 np.dot((1,m),(m,1))
+
+                # 3. 如果加权错误率最小，则将当前的单层决策树设为最佳单层决策树
                 if weight_error < min_error:
                     min_error = weight_error
                     best_stump['dim'] = i
                     best_stump['thresh_val'] = thresh_val
                     best_stump['inequal'] = inequal
-                    best_predict = predict_labels.copy()
+                    best_predicts = cur_predicts.copy()
 
-    return best_stump, min_error, best_predict.reshape((m, 1))
+                if is_print:
+                    print('split: 第 {} 个特征, 阈值 {}, 假设 {}, 加权错误率 {}'.format(i, thresh_val, inequal, weight_error))
+
+    return best_stump, min_error, best_predicts
 
 
-def adaBoost_trainDS(trainset, iter_num=40, is_print=False):
+def stump_classify(trainset, dim, thresh_val, inequal):
     '''
-    AdaBoost 分类器训练，其中 DS 代表弱分类器为单层决策树
-    :param trainset : [np.array]训练集,维度为(m,n+1)
-    :param iter_num : [int]最大迭代次数
-    :param is_print : [boolean] 是否打印中间结果
-    :return :
+    单层决策树的分类函数
+    预测结果 +1 和 -1
+    :param trainset: [np.array] 训练集
+    :param dim: [int] 第 dim 个特征
+    :param thresh_val: [float] 阈值
+    :param inequal: [str] 假设
+    :return: [np.array(m,1)] 单层决策树的分类函数
     '''
-    weak_classifiers = []  # 单层决策树数组
-    m = trainset.shape[0]
-    D = np.ones((m, 1)) / m # 初始化样本权重
-    agg_predict = np.zeros(D.shape)  # 最终分类器的分类结果，等于每个弱分类器分类结果乘以其权重的总和。
+    cur_predicts = np.ones((trainset.shape[0],1))  # 当前分类器的分类结果
+    if inequal == 'lt':  # 大于阈值为正样本
+        cur_predicts[trainset[:, dim] <= thresh_val] = -1.0
+    else:  # 大于阈值为负样本
+        cur_predicts[trainset[:, dim] > thresh_val] = -1.0
+    return cur_predicts
+
+
+def adaboost_trainDS(trainset, iter_num=40, is_print=False):
+    '''
+    基于单层决策树的 AdaBoost 训练过程
+    :param trainset: [np.array(m,n+1)] 训练集
+    :param iter_num: [int] 迭代次数
+    :param is_print: [boolean] 是否输出中间过程
+    :return: [list] DS_array 单层决策树的数组,即多个弱分类器的组合，形成最终分类器
+             [np.array(m,1)] 最终分类器的分类结果
+    '''
+    m,n = trainset.shape
+    n = n-1
+    labels = trainset[:,-1].reshape((m,1))
+
+    # 1. 初始化
+    D = np.ones(labels.shape) / m  # 初始化样本权重向量
+    DS_array = []  # 单层决策树的数组
+    agg_predicts = np.zeros(labels.shape)  # 最终分类器的分类结果
+
+    # 2. 得到单层决策树的数组
     for i in range(iter_num):
-        print('第 {} 次迭代'.format(i + 1))
-        # 训练最佳单层决策树
-        best_stump, min_error, best_predict = build_stump(trainset, D, False)
+        # 2.1 基于当前样本权重向量，找到最佳的单层决策树
+        best_stump, min_error, best_predicts = stump_train(trainset, D)
 
-        # 更新分类器权重 alpha 并将最佳单层决策树加入到单层决策树数组
-        alpha = float(0.5 * np.log((1.0 - min_error) / max(min_error, 1e-16)))  # 更新分类器权重，同时需要防止分母过小变成零然后发生零溢出
+        # 2.2 计算当前弱分类器的权重
+        alpha = float(0.5 * np.log((1 - min_error) / max(min_error, 1e-16)))  # 分母的处理是为了分母过小,程序四舍五入为 0 造成零溢出
+
+
+        # 2.3 将最佳单层决策树加入到单层决策树数组
         best_stump['alpha'] = alpha
-        weak_classifiers.append(best_stump)  # 将最佳单层决策树加入到单层决策树数组
+        DS_array.append(best_stump)
 
-        # 计算新的 D
-        labels = trainset[:, -1].reshape(D.shape)  # 标签向量
-        expon = np.multiply(-1 * alpha, labels * best_predict)  # 公式中的分子中 e 的指数
-        D = D * np.exp(expon)  # 分子
+        # 2.4 计算新的样本权重向量 D
+        expon = np.multiply(-1*alpha, labels * best_predicts)  # 因为正确分类和错分的样本计算公式不同
+        D = D * np.exp(expon)
         D = D / np.sum(D)
 
-        # 求最终分类器的分类结果
-        agg_predict += alpha * best_predict
+        # 2.5 计算由当前弱分类数组组成形成的最终分类器的分类结果
+        agg_predicts += alpha * best_predicts  # 是个累加的过程
 
-        # 求最终分类器的错误率
-        temp = np.ones(agg_predict.shape)
-        temp[np.sign(agg_predict) == labels] = 0
-        error_rate = float(np.sum(temp)) / m
+        # 2.6 更新最终分类器错误率
+        error_arr = np.ones(labels.shape)
+        error_arr[np.sign(agg_predicts) == labels] = 0
+        error_rate = float(np.sum(error_arr)) / m
 
         if is_print:
-            print('当前训练集样本权重D : ', D.T)
-            print('当前弱分类器的分类结果 ：', best_predict.T)
-            print('当前弱分类器的错误率 : ', min_error)
-            print('最终分类器的分类结果 : ', agg_predict.T)
-        print('最终分类器的错误率 ： ', error_rate)
-        print('=======================================')
+            print('第 {} 次迭代'.format(i + 1))
+            print('当前弱分类器的错误率 ：', min_error)
+            print('最终分类器的错误率 ：', error_rate)
+            print('=======================================')
 
         if error_rate == 0.0:
             break
 
-    return weak_classifiers
+    return DS_array, agg_predicts
 
 
-def adaboost_classify(testset, classifiers, is_print=False):
+def adaboost_classify(classifier_array, testset):
     '''
-    AdaBoost 分类函数
-    :param testset : [np.array(m,n)] 测试集
-    :param classifiers : [list] AdaBoost 分类器,即弱分类器数组
-    :param is_print : [boolean] 是否打印中间结果
-    :return : [np.array(m,1)] 分类结果
+    用 AdaBoost 分类器进行分类
+    :param classifier_array: [list] 弱分类器组
+    :param testset: [np.array(m,n)] 测试集
+    :return: [np.array(m,1)] 分类结果
     '''
-    m = testset.shape[0]
-    predict_class = np.zeros((m,1))
-    for c in classifiers:  # 遍历每个弱分类器
-        temp_class = stump_classify(testset, c['dim'], c['thresh_val'], c['inequal'])  # 每个弱分类器的分类结果
-        predict_class += c['alpha'] * temp_class  # 加权求和
-        if is_print:
-            print('当前 AdaBoost 分类中间结果 ：', predict_class.T)
-
-    return np.sign(predict_class)
-
-# print('[[5,5],[0,0]] 标签分别为 1，-1 \n AdaBoost 分类结果是', adaboost_classify(np.array([[5,5],[0,0]]), weak_classifiers, True).T)
+    agg_labels = np.zeros((testset.shape[0],1))
+    for c in classifier_array:
+        predicts = stump_classify(testset, c['dim'], c['thresh_val'], c['inequal'])
+        agg_labels += c['alpha'] * predicts
+    return np.sign(agg_labels)
 
 
-
-def load_dataset(filename):
+def load_file_data(filename):
     '''
-    加载数据
-    :param filename : [str] 完整的文件名
-    :return : [np.array(m,n+1)] 数据集
+    从文件中读取数据
+    :param filename: [str] 完整的文件名
+    :return: [np.array(m,n+1)] 数据集
     '''
     fr = open(filename)
-    n = len(fr.readline().split('\t')) - 1
-    m = len(fr.readlines()) + 1  # 因为上一行代码读走了一行
-    dataset = np.ones((m,n+1))
+    lines = fr.readlines()
+    m = len(lines)
+    n = len(lines[0].strip().split('\t')) - 1
+    dataset = np.zeros((m,n+1))
     index = 0
-    fr = open(filename)
-    for line in fr.readlines():
-        line = line.strip().split('\t')
-        dataset[index,:] = np.array(line)
-        # dataset[index, -1] = np.where(dataset[index, -1] == 0, -1., 1.)
+    for l in lines:
+        dataset[index,:] = l.strip().split('\t')
         index += 1
     return dataset
 
 
-def create_simple_dataset():
+def test():
     '''
-    创建简单的训练集
-    :return : [np.array]训练集，维度是(m,n+1)
+    各个函数的单元测试
+    :return:
     '''
     dataset = np.array([
         [1., 2.1, 1.0],
@@ -163,23 +167,18 @@ def create_simple_dataset():
         [1., 1., -1.0],
         [2., 1., 1.0]
     ])
-    return dataset
+    # print('最佳单层决策树：',stump_train(dataset, np.ones((dataset.shape[0],1))/dataset.shape[0], True))
+    # DS_array, agg_predicts = adaboost_trainDS(dataset, 10, True)
 
+    # 较大数据集上测试
+    trainset = load_file_data('./dataset/horseColicTraining2.txt')
+    DS_array,_ = adaboost_trainDS(trainset, 10, True)
+    testset = load_file_data('./dataset/horseColicTest2.txt')
+    labels = adaboost_classify(DS_array, testset)
+    error_arr = np.ones(labels.shape)
+    error_arr[labels == testset[:,-1].reshape(labels.shape)] = 0
+    print('测试错误率：', np.sum(error_arr) / labels.shape[0])
 
-def test():
-    # weak_classifiers = adaBoost_trainDS(create_simple_dataset(), is_print=True)
-    # print(weak_classifiers)
-    # print('[[5,5],[0,0]] 标签分别为 1，-1 \n AdaBoost 分类结果是',
-    #       adaboost_classify(np.array([[5, 5], [0, 0]]), weak_classifiers, True).T)
-
-    trainset = load_dataset('./dataset/horseColicTraining2.txt')
-
-    classifiers = adaBoost_trainDS(trainset=trainset, iter_num=50, is_print=False)
-    # print(classifiers)
-    testset = load_dataset('./dataset/horseColicTest2.txt')
-    predic_class = adaboost_classify(testset=testset, classifiers=classifiers)
-    error_num = np.ones(predic_class.shape)
-    print(error_num[predic_class != testset[:, -1].reshape((testset.shape[0], 1))].sum() / testset.shape[0])
 
 if __name__ == '__main__':
     test()
